@@ -8,7 +8,7 @@ import { ChangePoint } from '../point.dto';
   1. controller 및 depository의 경우 고유의 비즈니스 로직이 없이 파라미터의 전달만을 담당하고 있어 1개의 layer에서만 테스트 하는 단위 테스트는 불가능 하다고 판단하여 생략
   2. point와 history의 경우 마찬가지로 고유의 비즈니스 로직 없지만 controller로 부터 전달받은 파라미터의 유효성 검사 테스트 진행
   3. charge와 use의 경우 고유로직은 있지만 repo로 부터 UserPoint객체를 전달받아 로직을 구현해야 함으로 전달받은 파라미터의 유효성 검사 테스트만 진행.
-
+  4. database에 stub가 구현되어 있기 때문에 stub를 이용한 테스를 하는게 힘들다고 판단.
   */
 
 describe('PointService', () => {
