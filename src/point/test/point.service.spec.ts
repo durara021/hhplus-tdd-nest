@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PointService } from '../point.service';
 import { PointRepositoryImpl } from '../point.repository';
-import { ChangePoint } from '../point.dto';
 
 /**
 
