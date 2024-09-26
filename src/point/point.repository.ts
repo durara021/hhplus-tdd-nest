@@ -78,7 +78,10 @@ export class PointRepositoryImpl implements PointRepository {
       // 포인트 업데이트
       const updatedUserPoint = await this.userDb.insertOrUpdate(changePoint.id, changePoint.point);
 
-      // 히스토리 추가
+      /** 히스토리 추가
+       * 사용하려는 포인트가 기존의 포인트보다 많을 경우
+       * error 처리하지 않고 userPoint의 point값 보존 및 실패 이력 추가
+       */ 
       let transactionType = TransactionType.USE;
       if(!changePoint.isBigger) transactionType = TransactionType.FAIL;
       await this.historyDb.insert(changePoint.id, changePoint.amount, transactionType, Date.now());

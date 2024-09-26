@@ -40,6 +40,11 @@ export class PointService {
 		return this.userMutexes.get(id) as Mutex;
 	}
 
+	/**
+	 * 1. point : controller로 부터 전달받은 id 객체를
+	 * repo의 point 메서드로 전달하여
+	 * 반환받은 UserPoint형태의 객체(id: number, point: number)를 controller로 반환
+	 */
 	async point(id: number): Promise<UserPoint> {
 
 		this.isValidNum(id, 'id');
@@ -47,17 +52,30 @@ export class PointService {
 
 	}
 
+	/**
+	 * 2. history 기능 : contorller로 부터 전달받은 id 객체를
+	 * repo로  전달하여 전달받은 id 객체를 depo의 history 메서드로 전달하여
+	 * 반환받은 PointHistory 객체를 controller로 반환
+	 */
 	async history(id: number): Promise<PointHistory[]> {
 		
 		this.isValidNum(id, 'id');
-		return this.pointRepository.history((await this.point(id)).id);
+		return this.pointRepository.history(id);
 
 	}
+
+	/**
+	 * 3. charge 기능 : contoller로 부터 amount객체의 값과 전달받은 id 객체를
+	 * repo의 point로 전달하여 반환받은 UserPoint의 point의 값(controller로 부터 전달받은 point 값 + amount 값) 을
+	 * 포함하여 ChangePoint의 형식으로 패키징한 뒤 repo의 charge메서드로 전달하여
+	 * 데이터 업데이트 및 히스토리 추가
+	 */
 
 	async charge(id: number, amount: number): Promise<UserPoint> {
 
 		this.isValidNum(id, 'id');
 		this.isValidNum(amount, 'amount');
+		this.isOver10000(amount);
 
 		const mutex = this.getUserMutex(id);
 
@@ -79,10 +97,17 @@ export class PointService {
 
 	}
 
+	/** 
+	 * 4. use 기능 : contoller로 부터 amount객체의 값과 전달받은 id 객체를
+	 * repo의 point로 전달하여 반환받은 UserPoint의 point의 값(controller로 부터 전달받은 point 값 - amount 값) 을
+	 * 포함하여 ChangePoint의 형식으로 패키징한 뒤 repo의  use메서드로 전달하여
+	 * 데이터 업데이트 및 히스토리 추가
+	 */
 	async use(id: number, amount: number): Promise<UserPoint> {
 
 		this.isValidNum(id, 'id');
 		this.isValidNum(amount, 'amount');
+		this.isOver10000(amount);
 
 		const mutex = this.getUserMutex(id);
 		const unlock = await mutex.lock(); // 동시성 제어 시작
@@ -109,6 +134,14 @@ export class PointService {
 		} finally {
 			unlock(); // 작업이 끝나면 뮤텍스 해제
 		}
+	}
+
+	//한 번에 10000이상 충전/사용 불가 정책
+	private isOver10000(amount: number){
+
+		if(amount < 10000) return;
+		throw new Error(`${amount}은 충전/사용 하실 수 없습니다.`);
+
 	}
 
 	private isValidNum(num: any, gubun: string){
