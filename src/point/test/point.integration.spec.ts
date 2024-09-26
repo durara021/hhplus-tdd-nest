@@ -3,13 +3,11 @@ import { PointService } from '../point.service';
 import { PointRepositoryImpl } from '../point.repository';
 import { UserPointTable } from '../../database/userpoint.table';
 import { PointHistoryTable } from '../../database/pointhistory.table';
-import { PointHistory, UserPoint } from '../point.model';
 
 describe('통합 테스트', () => {
   let service: PointService;
   let userPointTable: UserPointTable;
   let pointHistoryTable: PointHistoryTable;
-  let pointRepository: PointRepositoryImpl;
 
   beforeEach(async () => {
 
