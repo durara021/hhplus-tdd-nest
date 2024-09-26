@@ -9,6 +9,7 @@ export class PointController {
     constructor(
         private readonly pointService: PointService
     ) {}
+    
     /**
      * 유닛테스트가 필요하지 않다고 판단됨.
      *  - 단순히 id의 형변환 및 UserPoint속성의 point만 service로 넘겨주는 역할을 하기 때문

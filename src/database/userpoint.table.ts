@@ -17,19 +17,18 @@ export class UserPointTable {
             }, randomInt(200))
         )
     }
-    
+
     insertOrUpdate(id: number, amount: number): Promise<UserPoint> {
         this.isValidId(id)
         return new Promise((r) =>
             setTimeout(() => {
-                console.log(`포인트 : ${amount}`)
+                /* console.log(`포인트 : ${amount}`) */
                 const userPoint = { id: id, point: amount, updateMillis: Date.now() }
                 this.table.set(id, userPoint)
                 r(userPoint)
             }, randomInt(300))
         )
     }
-    
 
     private isValidId(id: number) {
         if (Number.isInteger(id) && id > 0) return

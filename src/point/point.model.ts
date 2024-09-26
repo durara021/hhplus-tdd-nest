@@ -10,7 +10,7 @@ export type UserPoint = {
  * - USE : 사용
  */
 export enum TransactionType {
-    CHARGE, USE
+    CHARGE, USE, FAIL
 }
 
 export type PointHistory = {
