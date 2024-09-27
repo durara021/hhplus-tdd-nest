@@ -14,47 +14,50 @@
  3. 들어온 순번대로의 순서가 보장될 것
 
 * 작성된 코드
-class Mutex {
-	private mutex = Promise.resolve();
-	async lock(): Promise<() => void> {
-		let unlock: () => void;
-		const willLock = new Promise<void>(resolve => unlock = resolve);
-		const previousLock = this.mutex;
-		this.mutex = this.mutex.then(() => willLock);
-		await previousLock;
-		return unlock!;
-	}
-}
-@Injectable()
-export class PointService {
-private readonly userMutexes: Map<number, Mutex> = new Map();
-	constructor(
-		private readonly pointRepository: PointRepositoryImpl
-	) {}
-	private getUserMutex(id: number): Mutex {
-		if (!this.userMutexes.has(id)) {
-		  this.userMutexes.set(id, new Mutex());
-		}
-		return this.userMutexes.get(id) as Mutex;
-	}
 
-	async charge(id: number, amount: number): Promise<UserPoint> {
-		this.isValidNum(id, 'id');
-		this.isValidNum(amount, 'amount');
-		this.isOver10000(amount);
-		const mutex = this.getUserMutex(id);
-		const unlock = await mutex.lock(); // 동시성 제어 시작
-		try {
-			const changePoint:ChangePoint = new ChangePoint();
-			changePoint.amount = amount;
-			changePoint.point = (await this.pointRepository.point(id)).point + amount;
-			changePoint.id = id;
-			return await this.pointRepository.charge(changePoint);
-		} finally {
-			unlock(); // 작업이 끝나면 뮤텍스 해제
-		}
-	}
-}
+        
+        class Mutex {
+        	private mutex = Promise.resolve();
+        	async lock(): Promise<() => void> {
+        		let unlock: () => void;
+        		const willLock = new Promise<void>(resolve => unlock = resolve);
+        		const previousLock = this.mutex;
+        		this.mutex = this.mutex.then(() => willLock);
+        		await previousLock;
+        		return unlock!;
+        	}
+        }
+
+        @Injectable()
+        export class PointService {
+        private readonly userMutexes: Map<number, Mutex> = new Map();
+        	constructor(
+        		private readonly pointRepository: PointRepositoryImpl
+        	) {}
+        	private getUserMutex(id: number): Mutex {
+        		if (!this.userMutexes.has(id)) {
+        		  this.userMutexes.set(id, new Mutex());
+        		}
+        		return this.userMutexes.get(id) as Mutex;
+        	}
+
+        	async charge(id: number, amount: number): Promise<UserPoint> {
+        		this.isValidNum(id, 'id');
+        		this.isValidNum(amount, 'amount');
+        		this.isOver10000(amount);
+        		const mutex = this.getUserMutex(id);
+        		const unlock = await mutex.lock(); // 동시성 제어 시작
+        		try {
+        			const changePoint:ChangePoint = new ChangePoint();
+        			changePoint.amount = amount;
+        			changePoint.point = (await this.pointRepository.point(id)).point + amount;
+        			changePoint.id = id;
+        			return await this.pointRepository.charge(changePoint);
+        		} finally {
+        			unlock(); // 작업이 끝나면 뮤텍스 해제
+        		}
+        	}
+        }
 
 * 해설
  1. PoinService의 charge메서드가 pointRepository의 charge함수를 호출하기 이전에
